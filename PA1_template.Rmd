@@ -135,7 +135,8 @@ There are **`r NAs` missing** values, *i.e.* non-complete cases.
 activityImp <- as.data.frame(activity)
 imp <- amelia(activityImp, # Impute values with Amelia package
               bound = rbind(c(1, 0, Inf), c(2, 0, Inf), c(3, 0, Inf)))
-activityImp1 <- tbl_df(imp[["imputations"]][[1]]) %>%
+activityImp1 <- imp[["imputations"]][[1]]
+activityImp1 <- tbl_df(activityImp1) %>%
         mutate(steps = as.integer(round(steps, 0))) # round imputations to integer
 ```
 
@@ -170,16 +171,19 @@ Here is presented the histogram  __of the single variable__ *total steps per day
 ## Are there differences in activity patterns between weekdays and weekends?
 
 ```{r ActivityWeek}
-activityWeek <- activityImp1 %>%                # Creating weekday/end factor
-        mutate(weekday = wday(date)) %>%
+activityWeek <- activityImp1
+activityWeek <- tbl_df(activityWeek) %>%        # Creating weekday/end factor
+        mutate(weekday = wday(date))
+activityWeek <- activityWeek %>%
         mutate(weekend = c(activityWeek$weekday %in% c(7, 1))) %>%
         mutate(weekend = factor(weekend, labels = c("weekday", "weekend")))
 
 ```
 
-```{r weekendTimeSeries, message = FALSE}
+```{r weekendTimeSeries, message = FALSE, fig.width = 11}
 # default ggplot2 line graph with panels or facets by weekday/end
-qplot(interval, steps, data = activityWeek, geom = "line", facets = weekend~., show_guide = T)
+qplot(interval, steps, data = activityWeek, geom = "line", facets = weekend~.)
+         
 ```
 
 This last graph, done with ggplot2 instead of lattice as was in the example, shows the mean of steps per interval for weekdays (up) and weekend (down), as the labels at the right indicates.

@@ -167,7 +167,8 @@ imp <- amelia(activityImp, # Impute values with Amelia package
 ```
 
 ```r
-activityImp1 <- tbl_df(imp[["imputations"]][[1]]) %>%
+activityImp1 <- imp[["imputations"]][[1]]
+activityImp1 <- tbl_df(activityImp1) %>%
         mutate(steps = as.integer(round(steps, 0))) # round imputations to integer
 ```
 
@@ -201,14 +202,16 @@ qplot(steps, data = stepsbyday2, geom = "histogram", show_guide = T) +
 
 ![plot of chunk stepsHistogramImp](figure/stepsHistogramImp-1.png) 
 
-Here is presented the histogram  __of the single variable__ *total steps per day*, for the imputed dataset. The __mean (13186.36)__ of *steps takes per day*, and the __median (11458)__ for imputed dataset are also ploted as a red and a pointed-green lines respectively. With the imputation, both average measures have changed. Nonetheless, the **median increased** 'only' **1063**, while the **mean** has **increased 3832.13**. The data has changed from being biased towards low numbers ("to the left"), to a bias towards higher numbers ("to the right").
+Here is presented the histogram  __of the single variable__ *total steps per day*, for the imputed dataset. The __mean (13291.23)__ of *steps takes per day*, and the __median (11458)__ for imputed dataset are also ploted as a red and a pointed-green lines respectively. With the imputation, both average measures have changed. Nonetheless, the **median increased** 'only' **1063**, while the **mean** has **increased 3937**. The data has changed from being biased towards low numbers ("to the left"), to a bias towards higher numbers ("to the right").
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
 
 ```r
-activityWeek <- activityImp1 %>%                # Creating weekday/end factor
-        mutate(weekday = wday(date)) %>%
+activityWeek <- activityImp1
+activityWeek <- tbl_df(activityWeek) %>%        # Creating weekday/end factor
+        mutate(weekday = wday(date))
+activityWeek <- activityWeek %>%
         mutate(weekend = c(activityWeek$weekday %in% c(7, 1))) %>%
         mutate(weekend = factor(weekend, labels = c("weekday", "weekend")))
 ```
@@ -216,7 +219,7 @@ activityWeek <- activityImp1 %>%                # Creating weekday/end factor
 
 ```r
 # default ggplot2 line graph with panels or facets by weekday/end
-qplot(interval, steps, data = activityWeek, geom = "line", facets = weekend~., show_guide = T)
+qplot(interval, steps, data = activityWeek, geom = "line", facets = weekend~.)
 ```
 
 ![plot of chunk weekendTimeSeries](figure/weekendTimeSeries-1.png) 
